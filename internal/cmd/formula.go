@@ -219,8 +219,8 @@ func runFormulaRun(cmd *cobra.Command, args []string) error {
 	targetRig := formulaRunRig
 	var rigPath string
 	if targetRig == "" {
-		// Try to detect from current directory
-		townRoot, err := workspace.FindFromCwd()
+		// Try to detect from current directory (falls back to GT_TOWN_ROOT env var)
+		townRoot, err := workspace.FindFromCwdOrError()
 		if err == nil && townRoot != "" {
 			rigName, r, rigErr := findCurrentRig(townRoot)
 			if rigErr == nil && rigName != "" {
@@ -240,7 +240,7 @@ func runFormulaRun(cmd *cobra.Command, args []string) error {
 		}
 	} else {
 		// If rig specified, construct path
-		townRoot, err := workspace.FindFromCwd()
+		townRoot, err := workspace.FindFromCwdOrError()
 		if err == nil && townRoot != "" {
 			rigPath = filepath.Join(townRoot, targetRig)
 		}
@@ -702,7 +702,7 @@ func findFormulaFile(name string) (string, error) {
 	}
 
 	// 2. Town .beads/formulas/
-	if townRoot, err := workspace.FindFromCwd(); err == nil {
+	if townRoot, err := workspace.FindFromCwdOrError(); err == nil {
 		searchPaths = append(searchPaths, filepath.Join(townRoot, ".beads", "formulas"))
 	}
 

@@ -55,18 +55,35 @@ func trimJSONForError(jsonOutput []byte) string {
 // Formulas are TOML files (.formula.toml).
 // Uses --allow-stale for consistency with verifyBeadExists.
 func verifyFormulaExists(formulaName string) error {
+	// Resolve town root so bd can find town-level formulas even when CWD is
+	// outside ~/gt (e.g., running gt sling from a repo directory with GT_TOWN_ROOT set).
+	// bd needs GT_ROOT for the formula search path and BEADS_DIR for the database.
+	gtRoot, _ := workspace.FindFromCwdOrError()
+	townBeadsDir := ""
+	if gtRoot != "" {
+		townBeadsDir = filepath.Join(gtRoot, ".beads")
+	}
+
+	applyRootEnv := func(c *bdCmd) *bdCmd {
+		if gtRoot != "" {
+			c = c.WithGTRoot(gtRoot)
+		}
+		if townBeadsDir != "" {
+			c = c.WithBeadsDir(townBeadsDir)
+		}
+		return c
+	}
+
 	// Try bd formula show (handles all formula file formats)
 	// Use Output() instead of Run() to detect bd exit 0 bug:
 	// when formula not found, bd may exit 0 but produce empty stdout.
 	// Stderr discarded — first attempt may fail expectedly (retry with mol- prefix).
-	if out, err := BdCmd("formula", "show", formulaName, "--allow-stale").
-		Stderr(io.Discard).Output(); err == nil && len(out) > 0 {
+	if out, err := applyRootEnv(BdCmd("formula", "show", formulaName, "--allow-stale").Stderr(io.Discard)).Output(); err == nil && len(out) > 0 {
 		return nil
 	}
 
 	// Try with mol- prefix
-	if out, err := BdCmd("formula", "show", "mol-"+formulaName, "--allow-stale").
-		Stderr(io.Discard).Output(); err == nil && len(out) > 0 {
+	if out, err := applyRootEnv(BdCmd("formula", "show", "mol-"+formulaName, "--allow-stale").Stderr(io.Discard)).Output(); err == nil && len(out) > 0 {
 		return nil
 	}
 
@@ -79,7 +96,8 @@ func runSlingFormula(ctx context.Context, args []string) error {
 	formulaName := args[0]
 
 	// Get town root early - needed for BEADS_DIR when running bd commands
-	townRoot, err := workspace.FindFromCwd()
+	// Falls back to GT_TOWN_ROOT env var so formula sling works from outside ~/gt.
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return fmt.Errorf("finding town root: %w", err)
 	}
