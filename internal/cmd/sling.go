@@ -267,7 +267,9 @@ func runSling(cmd *cobra.Command, args []string) (retErr error) {
 
 	// Get town root early - needed for BEADS_DIR when running bd commands
 	// This ensures hq-* beads are accessible even when running from polecat worktree
-	townRoot, err := workspace.FindFromCwd()
+	// Use FindFromCwdOrError so GT_TOWN_ROOT is respected when CWD is outside the town
+	// (e.g. running gastown-demo.sh from the target repo's checkout directory).
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return fmt.Errorf("finding town root: %w", err)
 	}
@@ -401,7 +403,7 @@ func runSling(cmd *cobra.Command, args []string) (retErr error) {
 			DryRun:      slingDryRun,
 			Force:       slingForce,
 			NoMerge:     slingNoMerge,
-				ReviewOnly:  slingReviewOnly,
+			ReviewOnly:  slingReviewOnly,
 			Account:     slingAccount,
 			Agent:       slingAgent,
 			HookRawBead: slingHookRawBead,
