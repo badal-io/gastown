@@ -98,6 +98,10 @@ func runCrewStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(items) == 0 {
+		if crewJSON {
+			fmt.Println("[]")
+			return nil
+		}
 		fmt.Println("No crew workspaces found.")
 		return nil
 	}

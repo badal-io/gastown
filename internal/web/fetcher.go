@@ -32,7 +32,15 @@ func runCmd(timeout time.Duration, name string, args ...string) (*bytes.Buffer, 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, name, args...)
+	// Use tmux.BuildCommandContext for tmux commands so the Gas Town
+	// socket (-L flag) is included. Without this, the dashboard cannot
+	// discover sessions running on the town's custom tmux socket.
+	var cmd *exec.Cmd
+	if name == "tmux" {
+		cmd = tmux.BuildCommandContext(ctx, args...)
+	} else {
+		cmd = exec.CommandContext(ctx, name, args...)
+	}
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 

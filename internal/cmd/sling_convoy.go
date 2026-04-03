@@ -32,7 +32,7 @@ func slingGenerateShortID() string {
 // issue_id (which is the convoy). Since this only returns IDs (no issue_type
 // or status), we verify each candidate via bd show.
 func isTrackedByConvoy(beadID string) string {
-	townRoot, err := workspace.FindFromCwd()
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return ""
 	}
@@ -142,7 +142,7 @@ func getConvoyInfoForIssue(issueID string) *ConvoyInfo {
 		return nil
 	}
 
-	townRoot, err := workspace.FindFromCwd()
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return nil
 	}
@@ -225,7 +225,7 @@ func getConvoyInfoFromIssue(issueID, cwd string) *ConvoyInfo {
 // tracked by another convoy, including all beads in that convoy with their
 // statuses, and recommended actions the user can take.
 func printConvoyConflict(beadID, convoyID string) {
-	townRoot, err := workspace.FindFromCwd()
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		fmt.Printf("\n  %s is already tracked by convoy %s\n", beadID, convoyID)
 		return
@@ -308,7 +308,7 @@ func createBatchConvoy(beadIDs []string, rigName string, owned bool, mergeStrate
 		return "", nil, fmt.Errorf("no beads to track")
 	}
 
-	townRoot, err := workspace.FindFromCwd()
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return "", nil, fmt.Errorf("finding town root: %w", err)
 	}
@@ -371,7 +371,7 @@ func createAutoConvoy(beadID, beadTitle string, owned bool, mergeStrategy, baseB
 		return "", fmt.Errorf("refusing to create convoy: bead title %q looks like a CLI flag", beadTitle)
 	}
 
-	townRoot, err := workspace.FindFromCwd()
+	townRoot, err := workspace.FindFromCwdOrError()
 	if err != nil {
 		return "", fmt.Errorf("finding town root: %w", err)
 	}

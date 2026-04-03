@@ -15,6 +15,15 @@
             --cyan: #95e6cb;
             --orange: #ff8f40;
             --pink: #ff79c6;
+
+            /* Panel and column widths — override to adjust dashboard layout */
+            --panel-min-width: 403px;  /* panel grid minimum (350px + 15%) */
+            --col-sm: 92px;            /* narrow columns, e.g. progress cells (80px + 15%) */
+            --col-md: 138px;           /* badge/label columns (120px + 15%) */
+            --col-lg: 173px;           /* rig URL, crew hook (150px + 15%) */
+            --col-xl: 207px;           /* polecat issue, hook title (180px + 15%) */
+            --col-2xl: 230px;          /* issue/mail/ready titles (200px + 15%) */
+            --col-3xl: 288px;          /* PR title (250px + 15%) */
         }
 
         * {
@@ -84,7 +93,7 @@
         /* Grid layout for panels - auto-fit responsive */
         .panels {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(var(--panel-min-width), 1fr));
             gap: 16px;
             margin-bottom: 16px;
             width: 100%;
@@ -225,11 +234,11 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 120px;
+            max-width: var(--col-md);
         }
 
         .convoy-progress-cell {
-            min-width: 80px;
+            min-width: var(--col-sm);
         }
 
         .convoy-progress-header {
@@ -265,7 +274,7 @@
         }
 
         .convoy-work-cell {
-            min-width: 80px;
+            min-width: var(--col-sm);
         }
 
         .convoy-work-breakdown {
@@ -501,7 +510,7 @@
 
         .tracked-issue-title {
             color: var(--text-secondary);
-            max-width: 200px;
+            max-width: var(--col-2xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -618,7 +627,7 @@
         .status-hint {
             color: var(--text-muted);
             font-size: 0.75rem;
-            max-width: 200px;
+            max-width: var(--col-2xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -627,7 +636,7 @@
         /* Polecat issue styles */
         .polecat-issue {
             font-size: 0.8rem;
-            max-width: 180px;
+            max-width: var(--col-xl);
         }
 
         .polecat-issue .issue-id {
@@ -662,7 +671,7 @@
         .crew-hook {
             color: var(--blue);
             font-size: 0.8rem;
-            max-width: 150px;
+            max-width: var(--col-lg);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1003,7 +1012,7 @@
 
         .ready-title {
             color: var(--text-secondary);
-            max-width: 200px;
+            max-width: var(--col-2xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1060,7 +1069,7 @@
 
         .mail-subject {
             color: var(--text-primary);
-            max-width: 200px;
+            max-width: var(--col-2xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1089,7 +1098,7 @@
 
         .pr-title {
             color: var(--text-secondary);
-            max-width: 250px;
+            max-width: var(--col-3xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1160,7 +1169,7 @@
         .rig-url {
             color: var(--text-muted);
             font-size: 0.75rem;
-            max-width: 150px;
+            max-width: var(--col-lg);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1188,7 +1197,7 @@
 
         .hook-title {
             color: var(--text-secondary);
-            max-width: 180px;
+            max-width: var(--col-xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1341,7 +1350,7 @@
 
         .issue-title {
             color: var(--text-secondary);
-            max-width: 200px;
+            max-width: var(--col-2xl);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

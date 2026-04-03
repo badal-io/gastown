@@ -17,6 +17,7 @@ import (
 	"github.com/steveyegge/gastown/internal/beads"
 	"github.com/steveyegge/gastown/internal/session"
 	"github.com/steveyegge/gastown/internal/tmux"
+	"github.com/steveyegge/gastown/internal/workspace"
 )
 
 // CommandRequest is the JSON request body for /api/run.
@@ -76,7 +77,12 @@ func NewAPIHandler(defaultRunTimeout, maxRunTimeout time.Duration, csrfToken str
 	}
 	// Use PATH lookup for gt binary. Do NOT use os.Executable() here - during
 	// tests it returns the test binary, causing fork bombs when executed.
-	workDir, _ := os.Getwd()
+	// Use town root as workDir so bd commands find the HQ beads dir even
+	// when the dashboard is launched from outside ~/gt (GH #3315-class fix).
+	workDir, err := workspace.FindFromCwdOrError()
+	if err != nil {
+		workDir, _ = os.Getwd()
+	}
 	return &APIHandler{
 		gtPath:            "gt",
 		workDir:           workDir,
@@ -1999,7 +2005,7 @@ func (h *APIHandler) handleSessionPreview(w http.ResponseWriter, r *http.Request
 	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "tmux", "capture-pane", "-t", sessionName, "-p", "-J", "-S", "-30")
+	cmd := tmux.BuildCommandContext(ctx, "capture-pane", "-t", sessionName, "-p", "-J", "-S", "-30")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
